@@ -22,6 +22,8 @@
 #
 # For further information see <http://syscdbg.hagenberg.servus.at/>.
 
+import os.path
+
 from PyQt4.QtGui import QMainWindow, QFileDialog, QLabel, QDockWidget, QPixmap
 from PyQt4.QtCore import SIGNAL, QObject, Qt
 from ui_mainwindow import Ui_MainWindow
@@ -30,7 +32,6 @@ from helpers.recentfilehandler import OpenRecentFileAction, RecentFileHandler
 from helpers.actions import Actions
 from helpers.pluginloader import PluginLoader
 from controllers.quickwatch import QuickWatch
-
 
 class MainWindow(QMainWindow):
     
@@ -84,6 +85,8 @@ class MainWindow(QMainWindow):
         self.readSettings()
 
         self.quickwatch = QuickWatch(self, self.distributedObjects)
+        
+        self.lastDirectory = os.path.curdir
 
     def setupUi(self):
         self.__initActions()
@@ -254,9 +257,10 @@ class MainWindow(QMainWindow):
                 "InitialWindowPlacement/windowState").toByteArray())
 
     def showOpenExecutableDialog(self):
-        filename = str(QFileDialog.getOpenFileName(self, "Open Executable"))
+        filename = str(QFileDialog.getOpenFileName(self, "Open Executable", self.lastDirectory))
         if (filename != ""):
             self.debugController.openExecutable(filename)
+            self.lastDirectory = os.path.dirname(filename)
 
     def showLoadPluginsDialog(self):
         dialog = QFileDialog()
